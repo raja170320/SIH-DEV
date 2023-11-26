@@ -1,0 +1,23 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DEV_REGISTRY: registry.example.com/dev_repo  # Replace with your dev repository URL
+  TEST_REGISTRY: registry.example.com/test_repo  # Replace with your test repository URL
+  IMAGE_NAME: your_image_name
+
+build:
+  stage: build
+  script:
+    - docker build -t $DEV_REGISTRY/$IMAGE_NAME .
+    - docker push $DEV_REGISTRY/$IMAGE_NAME
+
+deploy_to_test:
+  stage: deploy
+  script:
+    - docker pull $DEV_REGISTRY/$IMAGE_NAME
+    - docker tag $DEV_REGISTRY/$IMAGE_NAME $TEST_REGISTRY/$IMAGE_NAME
+    - docker push $TEST_REGISTRY/$IMAGE_NAME
+  only:
+    - master  # Run this job only on changes to the master branch or other branches as needed
